@@ -1,0 +1,21 @@
+{
+  "name": "react-di",
+  "version": "0.0.1",
+  "description": "Dependency management for React.js",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test test/*_test.js"
+  },
+  "keywords": [
+    "react",
+    "react.js",
+    "di",
+    "dependency",
+    "injection"
+  ],
+  "author": "Ján Jakub Naništa",
+  "license": "MIT"
+}

@@ -1,0 +1,12 @@
+{
+	"node": true,
+	"browser": true,
+	"unused": true,
+	"globals": {
+		"describe": false,
+		"context": false,
+		"beforeEach": false,
+		"afterEach": false,
+		"it": false
+	}
+}

@@ -7,7 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha test test/*_test.js"
+    "test": "mocha test/*_test.js",
+    "dev": "mocha --watch lib/*.js test/*_test.js"
   },
   "keywords": [
     "react",
@@ -17,5 +18,9 @@
     "injection"
   ],
   "author": "Ján Jakub Naništa",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "mocha": "^2.1.0"
+  }
 }

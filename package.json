@@ -18,7 +18,10 @@
     "dependency",
     "injection"
   ],
-  "author": "Ján Jakub Naništa",
+  "author": {
+    "name": "Ján Jakub Naništa",
+    "email": "jan.jakub.nanista@gmail.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "expect.js": "^0.3.1",

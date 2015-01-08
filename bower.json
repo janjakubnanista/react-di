@@ -6,7 +6,7 @@
     "Ján Jakub Naništa <jan.jakub.nanista@gmail.com>"
   ],
   "description": "Dependency management for React.js",
-  "main": "dist/index.js",
+  "main": "dist/react-di.js",
   "moduleType": [
     "amd",
     "globals",

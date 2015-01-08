@@ -9,7 +9,7 @@
   "scripts": {
     "test": "mocha test/*_test.js",
     "dev": "mocha --watch lib/*.js test/*_test.js",
-    "build": "webpack lib/mixin.js dist/mixin.js --output-library ReactDI --output-library-target umd"
+    "build": "rm -rf dist && webpack lib/mixin.js dist/react-di.js --output-library ReactDI --output-library-target umd"
   },
   "keywords": [
     "react",

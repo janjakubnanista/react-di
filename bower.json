@@ -1,0 +1,27 @@
+{
+  "name": "react-di",
+  "version": "0.0.1",
+  "homepage": "https://github.com/janjakubnanista/react-di",
+  "authors": [
+    "Ján Jakub Naništa <jan.jakub.nanista@gmail.com>"
+  ],
+  "description": "Dependency management for React.js",
+  "main": "dist/index.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "react",
+    "react.js",
+    "dependency injection",
+    "di"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "test"
+  ]
+}

@@ -2,13 +2,14 @@
   "name": "react-di",
   "version": "0.0.1",
   "description": "Dependency management for React.js",
-  "main": "index.js",
+  "main": "dist/mixin.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "test": "mocha test/*_test.js",
-    "dev": "mocha --watch lib/*.js test/*_test.js"
+    "dev": "mocha --watch lib/*.js test/*_test.js",
+    "build": "webpack lib/mixin.js dist/mixin.js --output-library ReactDI --output-library-target umd"
   },
   "keywords": [
     "react",
@@ -21,6 +22,7 @@
   "license": "MIT",
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "mocha": "^2.1.0"
+    "mocha": "^2.1.0",
+    "webpack": "^1.4.15"
   }
 }

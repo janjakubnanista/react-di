@@ -93,6 +93,7 @@ will be automatically available on created instance.
 Register new component or multiple components.
 
 **`name`** *`Object|String`* Name of the component or an object hash of components.
+
 **`component`** *`Mixed`* *[optional]* Component to register. Only needed if `name` was a String.
 
 `resolver.canResolve(name);`

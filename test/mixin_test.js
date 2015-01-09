@@ -101,14 +101,39 @@ describe('Mixin', function() {
 		});
 
 		describe('canResolve()', function() {
-			it('should return false if no such component was registered', function() {
-				expect(this.mixin.canResolve('message')).to.be(false);
+			context('called with a string', function() {
+				it('should return false if no such component was registered', function() {
+					expect(this.mixin.canResolve('message')).to.be(false);
+				});
+
+				it('should return true if a component was registered', function() {
+					this.mixin.register('message', {});
+
+					expect(this.mixin.canResolve('message')).to.be(true);
+				});
 			});
 
-			it('should return true if a component was registered', function() {
-				this.mixin.register('message', {});
+			context('called with an array', function() {
+				beforeEach(function() {
+					this.message = {};
+					this.alert = {};
 
-				expect(this.mixin.canResolve('message')).to.be(true);
+					this.mixin.register('message', this.message);
+					this.mixin.register('alert', this.alert);
+				});
+
+				afterEach(function() {
+					delete this.message;
+					delete this.alert;
+				});
+
+				it('should return true if all dependencies were found', function() {
+					expect(this.mixin.canResolve(['message', 'alert'])).to.be(true);
+				});
+
+				it('should return false was not found', function() {
+					expect(this.mixin.canResolve(['message', 'alert', 'confirmation'])).to.be(false);
+				});
 			});
 		});
 

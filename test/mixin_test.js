@@ -29,6 +29,19 @@ describe('Mixin', function() {
 				expect(mixin.resolve('collection')).to.be(collection);
 			});
 		});
+
+		context('if called with an instance of Mixin', function() {
+			it('should register all of its registered components', function() {
+				var message = {};
+				var mixin = new Mixin({
+					message: message
+				});
+
+				var childMixin = new Mixin(mixin);
+
+				expect(mixin.resolve('message')).to.be(childMixin.resolve('message'));
+			});
+		});
 	});
 
 	describe('methods', function() {
@@ -41,17 +54,49 @@ describe('Mixin', function() {
 		});
 
 		describe('resolve()', function() {
-			it('should throw an error if no component was found', function() {
-				expect(function() {
-					this.mixin.resolve('message');
-				}.bind(this)).to.throwException(/^DI: Component "message" not found$/);
+			context('called with a string', function() {
+				it('should throw an error if no component was found', function() {
+					expect(function() {
+						this.mixin.resolve('message');
+					}.bind(this)).to.throwException(/^DI: Component "message" not found$/);
+				});
+
+				it('should return registered component if found', function() {
+					var message = {};
+					this.mixin.register('message', message);
+
+					expect(this.mixin.resolve('message')).to.be(message);
+				});
 			});
 
-			it('should return registered component if found', function() {
-				var message = {};
-				this.mixin.register('message', message);
+			context('called with an array', function() {
+				beforeEach(function() {
+					this.message = {};
+					this.alert = {};
 
-				expect(this.mixin.resolve('message')).to.be(message);
+					this.mixin.register('message', this.message);
+					this.mixin.register('alert', this.alert);
+				});
+
+				afterEach(function() {
+					delete this.message;
+					delete this.alert;
+				});
+
+				it('should return an object with resolved dependencies as attributes', function() {
+					var resolved = this.mixin.resolve(['message', 'alert']);
+
+					expect(resolved).to.eql({
+						message: this.message,
+						alert: this.alert
+					});
+				});
+
+				it('should throw an error if dependency was not found', function() {
+					expect(function() {
+						this.mixin.resolve(['message', 'confirmation']);
+					}.bind(this)).to.throwException();
+				});
 			});
 		});
 
@@ -64,6 +109,41 @@ describe('Mixin', function() {
 				this.mixin.register('message', {});
 
 				expect(this.mixin.canResolve('message')).to.be(true);
+			});
+		});
+
+		describe('register()', function() {
+			beforeEach(function() {
+				this.message = {};
+				this.alert = {};
+			});
+
+			afterEach(function() {
+				delete this.message;
+				delete this.alert;
+			});
+
+			context('called with an object hash', function() {
+				it('should register all object properties as components', function() {
+					this.mixin.register({
+						message: this.message,
+						alert: this.alert
+					});
+
+					expect(this.mixin.resolve('message')).to.be(this.message);
+					expect(this.mixin.resolve('alert')).to.be(this.alert);
+				});
+
+				it('should rewrite previously registered components', function() {
+					this.mixin.register('message', {});
+					this.mixin.register({
+						message: this.message,
+						alert: this.alert
+					});
+
+					expect(this.mixin.resolve('message')).to.be(this.message);
+					expect(this.mixin.resolve('alert')).to.be(this.alert);
+				});
 			});
 		});
 	});

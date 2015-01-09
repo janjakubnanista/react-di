@@ -2,7 +2,7 @@
   "name": "react-di",
   "version": "0.0.6",
   "description": "Dependency management for React.js",
-  "main": "dist/mixin.js",
+  "main": "dist/react-di.js",
   "directories": {
     "test": "test"
   },

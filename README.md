@@ -64,12 +64,12 @@ React.createClass({
 });
 ```
 
-Furthermore, `di.resolver` is a reference to your ReactDI instance, so you can do some advanced logic too:
+Furthermore, calling `di()` without any arguments returns a reference to your ReactDI instance, so you can do some advanced logic too:
 
 ```javascript
 React.createClass({
     render: function() {
-        var resolver = this.di.resolver; // Instance of our original resolver
+        var resolver = this.di(); // Instance of our original resolver
         var hasMessage = resolver.has('message');
         var text = hasMessage ? di('message').say('something') : 'something else'; // Pretty advanced, right?
 

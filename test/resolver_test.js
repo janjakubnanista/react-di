@@ -313,6 +313,19 @@ describe('Resolver', function() {
 					renderSpecification(specification, done);
 				});
 
+				it('should have resolver object accessible', function(done) {
+					var mixin = this.mixin;
+					var specification = {
+						render: function() {
+							expect(this.di()).to.be(mixin);
+
+							return React.DOM.div();
+						}
+					};
+
+					renderSpecification(specification, done);
+				});
+
 				it('should have arbitrary dependency accessible on di object', function(done) {
 					this.mixin.set({
 						message: message,

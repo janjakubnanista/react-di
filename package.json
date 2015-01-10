@@ -3,6 +3,13 @@
   "version": "0.0.7",
   "description": "Dependency management for React.js",
   "main": "dist/react-di.js",
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/janjakubnanista/react-di"
+  },
+  "bugs": {
+      "url": "https://github.com/janjakubnanista/react-di/issues"
+  },
   "directories": {
     "test": "test"
   },

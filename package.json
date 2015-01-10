@@ -7,9 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha test/*_test.js",
-    "dev": "mocha --watch lib/*.js test/*_test.js",
-    "build": "rm -rf dist && webpack lib/mixin.js dist/react-di.js --output-library ReactDI --output-library-target umd"
+    "test": ".rm -rf dist && gulp test",
+    "dev": "gulp dev",
+    "build": "rm -rf dist && gulp build"
   },
   "keywords": [
     "react",
@@ -24,7 +24,18 @@
   "license": "MIT",
   "devDependencies": {
     "expect.js": "^0.3.1",
+    "gulp": "^3.8.10",
+    "gulp-concat": "^2.4.3",
+    "gulp-if": "^1.2.5",
+    "gulp-webpack": "^1.1.2",
+    "karma": "^0.12.31",
+    "karma-firefox-launcher": "^0.1.4",
+    "karma-mocha": "^0.1.10",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "karma-sinon-expect": "^0.1.4",
+    "karma-spec-reporter": "0.0.16",
     "mocha": "^2.1.0",
+    "react": "^0.12.2",
     "webpack": "^1.4.15"
   }
 }

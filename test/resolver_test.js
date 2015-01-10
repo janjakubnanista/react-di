@@ -49,37 +49,37 @@ describe('Resolver', function() {
 			delete this.mixin;
 		});
 
-		describe('resolve()', function() {
+		describe('get()', function() {
 			context('called with a string', function() {
 				it('should throw an error if no component was found', function() {
 					expect(function() {
-						this.mixin.resolve('message');
-					}.bind(this)).to.throwException(/^DI: Component "message" not found$/);
+						this.mixin.get('message');
+					}.bind(this)).to.throwException(/^DI: Component message not found$/);
 				});
 
 				it('should return registered component if found', function() {
-					this.mixin.register('message', message);
+					this.mixin.set('message', message);
 
-					expect(this.mixin.resolve('message')).to.be(message);
+					expect(this.mixin.get('message')).to.be(message);
 				});
 
 				it('should throw an error if dependency was overwritten to falsy value', function() {
-					this.mixin.register('message', null);
+					this.mixin.set('message', null);
 
 					expect(function() {
-						this.mixin.resolve('message');
+						this.mixin.get('message');
 					}.bind(this)).to.throwException();
 				});
 			});
 
 			context('called with an array', function() {
 				beforeEach(function() {
-					this.mixin.register('message', message);
-					this.mixin.register('alert', alert);
+					this.mixin.set('message', message);
+					this.mixin.set('alert', alert);
 				});
 
 				it('should return an object with resolved dependencies as attributes', function() {
-					var resolved = this.mixin.resolve(['message', 'alert']);
+					var resolved = this.mixin.get(['message', 'alert']);
 
 					expect(resolved).to.eql({
 						message: message,
@@ -99,6 +99,55 @@ describe('Resolver', function() {
 					expect(function() {
 						this.mixin.get(['message', 'confirmation']);
 					}.bind(this)).to.throwException();
+				});
+			});
+		});
+
+		describe('getAny()', function() {
+			context('called with a string', function() {
+				it('should throw an error if no component was found', function() {
+					expect(function() {
+						this.mixin.getAny('message');
+					}.bind(this)).to.throwException(/^DI: Component message not found$/);
+				});
+
+				it('should return registered component if found', function() {
+					this.mixin.set('message', message);
+
+					expect(this.mixin.getAny('message')).to.be(message);
+				});
+
+				it('should throw an error if dependency was overwritten to falsy value', function() {
+					this.mixin.set('message', null);
+
+					expect(function() {
+						this.mixin.getAny('message');
+					}.bind(this)).to.throwException();
+				});
+			});
+
+			context('called with an array', function() {
+				beforeEach(function() {
+					this.mixin.set('message', message);
+					this.mixin.set('alert', alert);
+				});
+
+				it('should return first resolved dependency', function() {
+					expect(this.mixin.getAny(['confirmation', 'message', 'alert'])).to.be(message);
+				});
+
+				it('should throw an error if dependency was not registered', function() {
+					expect(function() {
+						this.mixin.getAny(['shouter', 'confirmation']);
+					}.bind(this)).to.throwException(/^DI: None of shouter, confirmation was found$/);
+				});
+
+				it('should throw an error if dependency was overwritten to falsy value', function() {
+					this.mixin.set('message', null);
+
+					expect(function() {
+						this.mixin.getAny(['message', 'confirmation']);
+					}.bind(this)).to.throwException(/^DI: None of message, confirmation was found$/);
 				});
 			});
 		});
@@ -134,6 +183,41 @@ describe('Resolver', function() {
 
 				it('should return false if dependency was not found', function() {
 					expect(this.mixin.has(['message', 'alert', 'confirmation'])).to.be(false);
+				});
+			});
+		});
+
+		describe('hasAny()', function() {
+			context('called with a string', function() {
+				it('should return false if no such component was registered', function() {
+					expect(this.mixin.hasAny('message')).to.be(false);
+				});
+
+				it('should return false if component was overwritten to falsy value', function() {
+					this.mixin.set('message', null);
+
+					expect(this.mixin.hasAny('message')).to.be(false);
+				});
+
+				it('should return name if a component was registered', function() {
+					this.mixin.set('message', {});
+
+					expect(this.mixin.hasAny('message')).to.be('message');
+				});
+			});
+
+			context('called with an array', function() {
+				beforeEach(function() {
+					this.mixin.set('message', message);
+					this.mixin.set('alert', alert);
+				});
+
+				it('should return name if at least one dependency was found', function() {
+					expect(this.mixin.hasAny(['confirmation', 'message', 'shouter'])).to.be('message');
+				});
+
+				it('should return false if no dependency was found', function() {
+					expect(this.mixin.has(['shouter', 'confirmation'])).to.be(false);
 				});
 			});
 		});

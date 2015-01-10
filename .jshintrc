@@ -6,7 +6,11 @@
 		"describe": false,
 		"context": false,
 		"beforeEach": false,
+		"before": false,
 		"afterEach": false,
-		"it": false
+		"after": false,
+		"it": false,
+		"expect": false,
+		"sinon": false
 	}
 }

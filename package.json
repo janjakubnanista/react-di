@@ -14,7 +14,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": ".rm -rf dist && gulp test",
+    "test": "rm -rf dist && gulp test",
     "dev": "gulp dev",
     "build": "rm -rf dist && gulp build"
   },

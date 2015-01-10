@@ -13,97 +13,160 @@ or via bower
 
 ## Usage
 
-    // If you're using Node.js, Browserify, Webpack or similar
-    var ReactDI = require('react-di');
+### Basic setup
 
-    // If you're just loading the file without any dependency management library
-    var ReactDI = window.ReactDI;
+To setup ReactDI, you have to obtain an instance of ReactDI first.
 
-    // Create a few components. These will probably reside in their own files.
+```javascript
+// If you're using Node.js, Browserify, Webpack or similar
+var ReactDI = require('react-di');
 
-    // Create an item component
-    var Item = React.createClass({
-        render: function() {
-            var formatter = this.props.resolver.resolve('formatter'),
-                text = formatter.format(this.props.text);
+// If you're just loading the file without any dependency management library
+var ReactDI = window.ReactDI;
 
-            return (
-                <div>{text}</div>
-            );
-        }
-    });
+// Create an instance of resolver
+var resolver = new ReactDI();
 
-    var Collection = React.createClass({
-        render: function() {
-            var Item = this.props.resolver.resolve('item');
+// Passing an object hash will automatically register
+// all of its properties
+var resolver = new ReactDI({
+    message: aMessageService,
+    alert: anAlertService
+});
+```
 
-            return (
-                <Item resolver={this.props.resolver} text={Hello}/>
-                <Item resolver={this.props.resolver} text={Hi}/>
-                <Item resolver={this.props.resolver} text={Hola}/>
-            );
-        }
-    });
+### ReactJS setup (preferred)
 
-    var Application = React.createClass({
-        render: function() {
-            var Collection = this.props.resolver.resolve('collection');
+Despite its name, you can use ReactDI without ReactJS. However, if you do, ReactDI
+provides a way to make your dependency injection much more straightforward.
 
-            return (
-                <Collection resolver={this.props.resolver}/>
-            );
-        }
-    });
+After you have obtained an instance of ReactDI, you have to explicitly tell it to work with React object.
 
-    // Create an arbitrary service
-    var Formatter = {
-        format: function(text) {
-            return text.toUpperCase();
-        }
-    };
+```javascript
+resolver.inject(React);
+```
 
-    // Create an instance of resolver
-    // Passing an object hash will automatically register all properties
-    // as components
-    var resolver = new ReactDI({
-        collection: Collection,
-        item: Item
-    });
+This causes ReactDI to intercept every call to `React.createClass`. ReactDI then enhances your
+class specification with `di()` method that proxies calls to `resolver.get()` method ([See below](#resolver.get)).
 
-    // Register additional dependency
-    // (This is here to demonstrate the functionality, of course you could pass
-    // this dependency along with others to constructor)
-    resolver.register('formatter', Formatter);
+As a consequence, you can access your dependencies in your component methods:
 
-    // Pass the resolver to components
-    React.render(<Application resolver={resolver}/>, document.body);
+```javascript
+React.createClass({
+    render: function() {
+        var message = this.di('message'); // A message service was previously registered
+        var text = message.say('something'); // Our message service does some work here
+
+        return (
+            <div>{text}</div>
+        );
+    }
+});
+```
+
+Furthermore, `di.resolver` is a reference to your ReactDI instance, so you can do some advanced logic too:
+
+```javascript
+React.createClass({
+    render: function() {
+        var resolver = this.di.resolver; // Instance of our original resolver
+        var hasMessage = resolver.has('message');
+        var text = hasMessage ? di('message').say('something') : 'something else'; // Pretty advanced, right?
+
+        return (
+            <div>{text}</div>
+        );
+    }
+});
+```
+
+To remove `React.createClass` interception, just call
+
+```javascript
+resolver.remove(React);
+```
+
+### ReactJS independent setup
+
+You can use ReactDI without automatic injection. You can simply take your ReactDI instance
+and pass it around via `props` (in ReactJS) or by any other means in any other framework
+or just plain old vanilla JavaScript.
+
+This might allow you to pass different resolvers to different components for example.
+
+To use it with React, try this:
+
+```javascript
+var Application = React.createClass({
+    render: function() {
+        var message = this.props.resolver.get('message'); // A message service was previously registered
+        var text = message.say('something');
+
+        // Pass resolver down the component hierarchy
+        return (
+            <AnotherComponent
+                resolver={this.props.resolver}
+                text={text}/>
+        );
+    }
+});
+
+// Pass the resolver to components
+React.render(<Application resolver={resolver}/>, document.body);
+```
 
 ## API
 
-`new ReactDI(map)`
+#### Constructor
 
-Constructor.
+##### Params
 
 **`map`** *`Object|ReactDI instance`* *[optional]* Existing ReactDI instance or an object hash of dependencies
 that will be registered on this instance. Any properties registered on this passed instance (or added to this passed object)
 will be automatically available on created instance.
 
-`resolver.register(name, component);`
 
-Register new component or multiple components.
+#### .set(name, component);
+
+Register new component or multiple components. If `component` is `null` then it is unregistered from the resolver.
+
+##### Params
 
 **`name`** *`Object|String`* Name of the component or an object hash of components.
 
 **`component`** *`Mixed`* *[optional]* Component to register. Only needed if `name` was a String.
 
-`resolver.canResolve(name);`
+
+
+#### .has(name);
 
 Returns `true` if a component with given name was registered on this resolver, `false` if not.
 
+##### Params
+
 **`name`** *`String|Array<String>`* String name or array of names to check.
 
-`resolver.resolve(name);`
 
-Returns a component registered under given name, or a collection of components.
+#### .hasAny(names);
+
+Returns the **name** of first resolved component if at least one of components with given name was registered on this resolver, `false` if not.
+
+##### Params
+
+**`names`** *`String|Array<String>`* String name or array of names to check.
+
+
+#### .get(name);<a name="resolver.get"></a>
+
+Returns a component registered under given name, or a collection of components. Throws an error if a component was not registered.
+
+##### Params
+
+**`name`** *`String|Array<String>`* String name or array of names to resolve.
+
+
+#### .getAny(names);
+
+Returns first resolved component or throws an error if none of requested components was registered.
 
 **`name`** *`String|Array<String>`* String name or array of names to resolve.

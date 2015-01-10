@@ -22,8 +22,8 @@ describe('Resolver', function() {
 					};
 
 				var mixin = new ReactDI(map);
-				expect(mixin.resolve('message')).to.be(message);
-				expect(mixin.resolve('alert')).to.be(alert);
+				expect(mixin.get('message')).to.be(message);
+				expect(mixin.get('alert')).to.be(alert);
 			});
 		});
 
@@ -35,7 +35,7 @@ describe('Resolver', function() {
 
 				var childReactDI = new ReactDI(mixin);
 
-				expect(mixin.resolve('message')).to.be(childReactDI.resolve('message'));
+				expect(mixin.get('message')).to.be(childReactDI.get('message'));
 			});
 		});
 	});
@@ -89,76 +89,76 @@ describe('Resolver', function() {
 
 				it('should throw an error if dependency was not registered', function() {
 					expect(function() {
-						this.mixin.resolve(['message', 'confirmation']);
+						this.mixin.get(['message', 'confirmation']);
 					}.bind(this)).to.throwException();
 				});
 
 				it('should throw an error if dependency was overwritten to falsy value', function() {
-					this.mixin.register('message', null);
+					this.mixin.set('message', null);
 
 					expect(function() {
-						this.mixin.resolve(['message', 'confirmation']);
+						this.mixin.get(['message', 'confirmation']);
 					}.bind(this)).to.throwException();
 				});
 			});
 		});
 
-		describe('canResolve()', function() {
+		describe('has()', function() {
 			context('called with a string', function() {
 				it('should return false if no such component was registered', function() {
-					expect(this.mixin.canResolve('message')).to.be(false);
+					expect(this.mixin.has('message')).to.be(false);
 				});
 
 				it('should return false if component was overwritten to falsy value', function() {
-					this.mixin.register('message', null);
+					this.mixin.set('message', null);
 
-					expect(this.mixin.canResolve('message')).to.be(false);
+					expect(this.mixin.has('message')).to.be(false);
 				});
 
 				it('should return true if a component was registered', function() {
-					this.mixin.register('message', {});
+					this.mixin.set('message', {});
 
-					expect(this.mixin.canResolve('message')).to.be(true);
+					expect(this.mixin.has('message')).to.be(true);
 				});
 			});
 
 			context('called with an array', function() {
 				beforeEach(function() {
-					this.mixin.register('message', message);
-					this.mixin.register('alert', alert);
+					this.mixin.set('message', message);
+					this.mixin.set('alert', alert);
 				});
 
 				it('should return true if all dependencies were found', function() {
-					expect(this.mixin.canResolve(['message', 'alert'])).to.be(true);
+					expect(this.mixin.has(['message', 'alert'])).to.be(true);
 				});
 
-				it('should return false was not found', function() {
-					expect(this.mixin.canResolve(['message', 'alert', 'confirmation'])).to.be(false);
+				it('should return false if dependency was not found', function() {
+					expect(this.mixin.has(['message', 'alert', 'confirmation'])).to.be(false);
 				});
 			});
 		});
 
-		describe('register()', function() {
+		describe('set()', function() {
 			context('called with an object hash', function() {
 				it('should register all object properties as components', function() {
-					this.mixin.register({
+					this.mixin.set({
 						message: message,
 						alert: alert
 					});
 
-					expect(this.mixin.resolve('message')).to.be(message);
-					expect(this.mixin.resolve('alert')).to.be(alert);
+					expect(this.mixin.get('message')).to.be(message);
+					expect(this.mixin.get('alert')).to.be(alert);
 				});
 
 				it('should rewrite previously registered components', function() {
-					this.mixin.register('message', {});
-					this.mixin.register({
+					this.mixin.set('message', {});
+					this.mixin.set({
 						message: message,
 						alert: alert
 					});
 
-					expect(this.mixin.resolve('message')).to.be(message);
-					expect(this.mixin.resolve('alert')).to.be(alert);
+					expect(this.mixin.get('message')).to.be(message);
+					expect(this.mixin.get('alert')).to.be(alert);
 				});
 			});
 		});
@@ -185,8 +185,8 @@ describe('Resolver', function() {
 
 			context('React.createClass', function() {
 				beforeEach(function() {
-					this.mixin.register('message', message);
-					this.mixin.register('alert', alert);
+					this.mixin.set('message', message);
+					this.mixin.set('alert', alert);
 				});
 
 				it('should call original method', function() {
@@ -230,7 +230,7 @@ describe('Resolver', function() {
 				});
 
 				it('should have arbitrary dependency accessible on di object', function(done) {
-					this.mixin.register({
+					this.mixin.set({
 						message: message,
 						alert: alert
 					});

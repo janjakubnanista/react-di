@@ -14,10 +14,14 @@ module.exports = function(config) {
 		autoWatch: false,
 		singleRun: true,
 		browsers: ['Firefox'],
-		reporters: ['spec'],
+		reporters: ['spec', 'coverage'],
 		preprocessors: {
-			'lib/*.js': ['commonjs'],
+			'lib/*.js': ['commonjs', 'coverage'],
 			'test/*_test.js': ['commonjs']
+		},
+		coverageReporter: {
+			type : 'html',
+			dir : 'coverage/'
 		}
 	});
 };

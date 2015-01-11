@@ -85,7 +85,10 @@ return /******/ (function(modules) { // webpackBootstrap
 				type = args[0],
 				props = (args[1] = args[1] || {});
 
-			props.di = type.__reactDI__ = (type.__reactDI__ || resolver.__diFor(type));
+			// Don't inject anything into HTML tag elements
+			if (typeof(type) !== 'string') {
+				props.di = type.__reactDI__ = (type.__reactDI__ || resolver.__diFor(type));
+			}
 
 			if (true) {
 				var deps = resolver.__normalizeDeps(type.dependencies),

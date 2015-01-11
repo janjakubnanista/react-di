@@ -64,27 +64,58 @@ return /******/ (function(modules) { // webpackBootstrap
 		this.map = Object.create(proto);
 	};
 
+	Resolver.prototype.__normalizeDeps = function(deps) {
+		if (utils.isArray(deps)) {
+			return deps.reduce(function(deps, name) {
+				deps[name] = name;
+
+				return deps;
+			}, {});
+		}
+
+		return deps || {};
+	};
+
 	Resolver.prototype.inject = function(React) {
-		var createClass = React.createClass,
+		var createElement = React.createElement,
 			resolver = this;
 
-		var newCreateClass = function(specification) {
-			// Add to class specification
-			specification.di = resolver.__diFor(specification);
+		var newCreateElement = function() {
+			var args = Array.prototype.slice.call(arguments),
+				type = args[0],
+				props = (args[1] = args[1] || {});
 
-			return createClass.call(React, specification);
+			props.di = type.__reactDI__ = (type.__reactDI__ || resolver.__diFor(type));
+
+			if (true) {
+				var deps = resolver.__normalizeDeps(type.dependencies),
+					depAliases = Object.keys(deps);
+
+				var unknown = depAliases
+					.map(function(alias) { return deps[alias]; })
+					.filter(function(name) { return !resolver.has(name); });
+
+				if (unknown.length) {
+					console.warn(
+						'ReactDI: Component ' + type.displayName + ' requires ' + unknown.join(', ') +
+						' but they are not registered'
+					);
+				}
+			}
+
+			return createElement.apply(React, args);
 		};
 
-		newCreateClass.restore = function() {
-			React.createClass = createClass;
+		newCreateElement.restore = function() {
+			React.createElement = createElement;
 		};
 
-		React.createClass = newCreateClass;
+		React.createElement = newCreateElement;
 	};
 
 	Resolver.prototype.remove = function(React) {
-		if (React.createClass.restore) {
-			React.createClass.restore();
+		if (React.createElement.restore) {
+			React.createElement.restore();
 		}
 	};
 
@@ -120,7 +151,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}.bind(this), null);
 
 		if (!found) {
-			throw new Error('DI: None of ' + names.join(', ') + ' was found');
+			throw new Error('ReactDI: None of ' + names.join(', ') + ' was found');
 		}
 
 		return found;
@@ -155,48 +186,36 @@ return /******/ (function(modules) { // webpackBootstrap
 			return this.map[name];
 		}
 
-		throw new Error('DI: Component ' + name + ' not found');
+		throw new Error('ReactDI: Component ' + name + ' not found');
 	};
 
 	Resolver.prototype.__has = function(name) {
 		return !!this.map[name];
 	};
 
-	Resolver.prototype.__diFor = function(specification) {
+	Resolver.prototype.__diFor = function(type) {
 		var resolver = this;
 
-		// Create dependency getter function
 		var di = function(name) {
+			if (arguments.length === 0) {
+				return resolver;
+			}
+
 			return resolver.get(name);
 		};
 
-		// Expose underlying resolver instance for advanced use
-		Object.defineProperty(di, 'resolver', {
-			enumerable: true,
-			writable: false,
-			value: resolver
-		});
-
-		// Check for required dependencies
-		var deps = specification.statics && specification.statics.dependencies;
-		if (deps && deps.length) {
-			// Get names of all dependencies
-			var depNames = Object.keys(deps);
-
-			// Make sure propTypes object exists
-			specification.propTypes = specification.propTypes || {};
-
-			// Add validator function that makes sure all dependecies can be resolved
-			specification.propTypes.di = function(props, propName, componentName) {
-				var cannotResolve = depNames.filter(function(name) {
-					return !resolver.has(name);
-				});
-
-				if (cannotResolve.length) {
-					return new Error('DI: ' + componentName + ' requires `' + cannotResolve.join(', '));
-				}
+		var deps = resolver.__normalizeDeps(type.dependencies),
+			depAliases = Object.keys(deps),
+			diProperties = depAliases.reduce(function(diProperties, alias) {
+			diProperties[alias] = {
+				enumerable: true,
+				get: di.bind(null, deps[alias])
 			};
-		}
+
+			return diProperties;
+		}, {});
+
+		Object.defineProperties(di, diProperties);
 
 		return di;
 	};

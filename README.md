@@ -46,15 +46,15 @@ After you have obtained an instance of ReactDI, you have to explicitly tell it t
 resolver.inject(React);
 ```
 
-This causes ReactDI to intercept every call to `React.createClass`. ReactDI then enhances your
-class specification with `di()` method that proxies calls to `resolver.get()` method ([See below](#resolver.get)).
+This causes ReactDI to intercept every call to `React.createElement`. ReactDI then enhances your
+element's `props` with `di` property. This property is a callable function that proxies calls to `resolver.get()` method ([See below](#resolver.get)).
 
 As a consequence, you can access your dependencies in your component methods:
 
 ```javascript
 React.createClass({
     render: function() {
-        var message = this.di('message'); // A message service was previously registered
+        var message = this.props.di('message'); // A message service was previously registered
         var text = message.say('something'); // Our message service does some work here
 
         return (
@@ -69,9 +69,11 @@ Furthermore, calling `di()` without any arguments returns a reference to your Re
 ```javascript
 React.createClass({
     render: function() {
-        var resolver = this.di(); // Instance of our original resolver
+        var resolver = this.props.di(); // Instance of our original resolver
         var hasMessage = resolver.has('message');
-        var text = hasMessage ? di('message').say('something') : 'something else'; // Pretty advanced, right?
+        var text = hasMessage ?
+            this.props.di('message').say('something') :
+            'something else'; // Pretty advanced, right?
 
         return (
             <div>{text}</div>
@@ -80,7 +82,56 @@ React.createClass({
 });
 ```
 
-To remove `React.createClass` interception, just call
+### Dependency validation
+
+**Only available when using development version of ReactDI**.
+
+If you create your React component class with `statics.dependencies` property, ReactDI checks
+whether all required dependencies are available on resolver. If not, warning is displayed.
+**Furthermore**, dependencies declared this way are available as read-only properties on `di` object:
+
+```javascript
+React.createClass({
+    statics: {
+        dependencies: ['message']
+    },
+    render: function() {
+        var message = this.props.di.message; // A message service is now available as a property
+        var text = message.say('something'); // Our message service does some work here
+
+        return (
+            <div>{text}</div>
+        );
+    }
+});
+```
+
+### Dependency aliasing
+
+If you create your React component class with `statics.dependencies` set to an object hash,
+your dependencies will be available on `di` object under their aliases based on this object:
+
+```javascript
+React.createClass({
+    statics: {
+        dependencies: {
+            msg: 'message'
+        }
+    },
+    render: function() {
+        var message = this.props.di.msg; // A message service is now aliased as `msg`
+        var text = message.say('something');
+
+        return (
+            <div>{text}</div>
+        );
+    }
+});
+```
+
+### Removing ReactDI injection
+
+To remove `React.createElement` interception (you should rarely need to do this), just call
 
 ```javascript
 resolver.remove(React);

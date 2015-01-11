@@ -56,7 +56,7 @@ describe('Resolver', function() {
 				it('should throw an error if no component was found', function() {
 					expect(function() {
 						this.mixin.get('message');
-					}.bind(this)).to.throwException(/^DI: Component message not found$/);
+					}.bind(this)).to.throwException(/^ReactDI: Component message not found$/);
 				});
 
 				it('should return registered component if found', function() {
@@ -110,7 +110,7 @@ describe('Resolver', function() {
 				it('should throw an error if no component was found', function() {
 					expect(function() {
 						this.mixin.getAny('message');
-					}.bind(this)).to.throwException(/^DI: Component message not found$/);
+					}.bind(this)).to.throwException(/^ReactDI: Component message not found$/);
 				});
 
 				it('should return registered component if found', function() {
@@ -141,7 +141,7 @@ describe('Resolver', function() {
 				it('should throw an error if dependency was not registered', function() {
 					expect(function() {
 						this.mixin.getAny(['shouter', 'confirmation']);
-					}.bind(this)).to.throwException(/^DI: None of shouter, confirmation was found$/);
+					}.bind(this)).to.throwException(/^ReactDI: None of shouter, confirmation was found$/);
 				});
 
 				it('should throw an error if dependency was overwritten to falsy value', function() {
@@ -149,7 +149,7 @@ describe('Resolver', function() {
 
 					expect(function() {
 						this.mixin.getAny(['message', 'confirmation']);
-					}.bind(this)).to.throwException(/^DI: None of message, confirmation was found$/);
+					}.bind(this)).to.throwException(/^ReactDI: None of message, confirmation was found$/);
 				});
 			});
 		});

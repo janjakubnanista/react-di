@@ -16,7 +16,7 @@
   "scripts": {
     "test": "./node_modules/karma/bin/karma start test/karma.conf.js",
     "dev": "./node_modules/karma/bin/karma start test/karma.conf.js --auto-watch --no-single-run",
-    "build": "rm -rf dist && npm test && gulp build"
+    "build": "rm -rf dist && npm test && gulp build && gulp build --minify"
   },
   "keywords": [
     "react",

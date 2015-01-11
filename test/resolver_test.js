@@ -1,6 +1,8 @@
 'use strict';
 
-/* global ReactDI,React */
+var ReactDI = require('../lib/resolver');
+
+/* global React */
 describe('Resolver', function() {
 	var message = { 'message': true },
 		alert = { 'alert': true };

@@ -18,11 +18,11 @@ gulp.task('build', function() {
 		.pipe(gulp.dest('dist'));
 });
 
-gulp.task('dev', ['build', 'test'], function() {
+gulp.task('dev', ['test'], function() {
 	gulp.watch(['lib/**', 'test/*_test.js'], ['test']);
 });
 
-gulp.task('test', ['build'], function(done) {
+gulp.task('test', function(done) {
 	var server = require('karma').server,
 		options = {
 			configFile: __dirname + '/test/karma.conf.js'

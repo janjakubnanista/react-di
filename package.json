@@ -14,7 +14,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "rm -rf dist && gulp test",
+    "test": "gulp test",
     "dev": "gulp dev",
     "build": "rm -rf dist && gulp build"
   },
@@ -36,6 +36,7 @@
     "gulp-if": "^1.2.5",
     "gulp-webpack": "^1.1.2",
     "karma": "^0.12.31",
+    "karma-commonjs": "0.0.13",
     "karma-firefox-launcher": "^0.1.4",
     "karma-mocha": "^0.1.10",
     "karma-phantomjs-launcher": "^0.1.4",

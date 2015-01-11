@@ -3,9 +3,8 @@
 module.exports = function(config) {
 	config.set({
 		basePath: '../',
-		frameworks: ['mocha', 'sinon-expect', 'commonjs'],
+		frameworks: ['mocha', 'sinon-expect', 'browserify'],
 		files: [
-			'node_modules/react/dist/react.js',
 			'lib/*.js',
 			'test/*_test.js'
 		],
@@ -16,12 +15,15 @@ module.exports = function(config) {
 		browsers: ['Firefox'],
 		reporters: ['spec', 'coverage'],
 		preprocessors: {
-			'lib/*.js': ['commonjs', 'coverage'],
-			'test/*_test.js': ['commonjs']
+			'lib/*.js': ['browserify', 'coverage'],
+			'test/*_test.js': ['browserify']
 		},
 		coverageReporter: {
 			type : 'html',
 			dir : 'coverage/'
+		},
+		browserify: {
+			transform: [['envify', { NODE_ENV: 'development' }]]
 		}
 	});
 };

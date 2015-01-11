@@ -250,101 +250,231 @@ describe('Resolver', function() {
 		});
 
 		describe('inject()', function() {
-			beforeEach(function() {
-				this.createClass = sinon.spy(React, 'createClass');
-				this.createElement = sinon.spy(React, 'createElement');
-				this.specification = { render: function() { return React.DOM.div(); } };
+			context('React.createElement', function() {
+				var div = React.DOM.div();
 
-				this.mixin.inject(React);
-			});
-
-			afterEach(function() {
-				this.mixin.remove(React);
-
-				this.createClass.restore();
-				this.createElement.restore();
-
-				delete this.createClass;
-				delete this.createElement;
-				delete this.specification;
-			});
-
-			context('React.createClass', function() {
-				beforeEach(function() {
-					this.mixin.set('message', message);
-					this.mixin.set('alert', alert);
-				});
-
-				it('should call original method', function() {
-					React.createClass(this.specification);
-
-					expect(this.createClass).to.be.calledOnce();
-				});
-
-				it('should add a di property with resolver instance', function() {
-					React.createClass(this.specification);
-
-					var di = this.createClass.getCall(0).args[0].di;
-					expect(di).to.be.a(Function);
-					expect(di.resolver).to.be(this.mixin);
-				});
-
-				it('should resolve arbitrary dependency when calling di property as a function', function() {
-					React.createClass(this.specification);
-
-					var di = this.createClass.getCall(0).args[0].di;
-
-					expect(di('message')).to.be(message);
-				});
-			});
-
-			context('React.render', function() {
 				function renderSpecification(specification, callback) {
 					React.render(React.createElement(React.createClass(specification)), document.body, callback);
 				}
 
-				it('should have di object accessible', function(done) {
+				beforeEach(function() {
+					this.createElement = sinon.spy(React, 'createElement');
+					this.warn = sinon.spy(console, 'warn');
+
+					this.mixin.inject(React);
+				});
+
+				afterEach(function() {
+					this.mixin.remove(React);
+
+					this.createElement.restore();
+					this.warn.restore();
+
+					delete this.createElement;
+					delete this.warn;
+				});
+
+				it('should overwrite original React.createElement method', function() {
+					var createElement = function() {},
+						React = { createElement: createElement };
+
+					this.mixin.inject(React);
+					expect(React.createElement).to.not.be(createElement);
+				});
+
+				it('should add di object to props', function(done) {
 					var specification = {
 						render: function() {
-							expect(this.di).to.be.a(Function);
+							expect(this.props.di).to.be.a(Function);
 
-							return React.DOM.div();
+							return div;
 						}
 					};
 
 					renderSpecification(specification, done);
 				});
 
-				it('should have resolver object accessible', function(done) {
+				it('should resolve a dependency by calling props.di with name', function(done) {
+					this.mixin.set('message', message);
+
+					var specification = {
+						render: function() {
+							expect(this.props.di('message')).to.be(message);
+
+							return div;
+						}
+					};
+
+					renderSpecification(specification, done);
+				});
+
+				it('should return resolver instance of calling di() without parameters', function(done) {
 					var mixin = this.mixin;
+
 					var specification = {
 						render: function() {
-							expect(this.di()).to.be(mixin);
+							expect(this.props.di()).to.be(mixin);
 
-							return React.DOM.div();
+							return div;
 						}
 					};
 
 					renderSpecification(specification, done);
 				});
 
-				it('should have arbitrary dependency accessible on di object', function(done) {
-					this.mixin.set({
-						message: message,
-						alert: alert
+				it('should inject di object even if class was created before inject was called', function(done) {
+					this.mixin.remove(React);
+
+					var specification = {
+						render: function() {
+							expect(this.props.di).to.be.a(Function);
+
+							return div;
+						}
+					};
+
+					var clazz = React.createClass(specification);
+
+					this.mixin.inject(React);
+					React.render(React.createElement(clazz), document.body, done);
+				});
+
+				it('should cache di object for type', function(done) {
+					var di;
+					var specification = {
+						render: function() {
+							if (di) {
+								expect(this.props.di).to.be(di);
+							}
+
+							di = this.props.di;
+
+							return div;
+						}
+					};
+
+					var type = React.createClass(specification);
+
+					var element1 = React.createElement(type),
+						element2 = React.createElement(type);
+
+					React.render(element1, document.body, function() {
+						React.render(element2, document.body, done);
+					});
+				});
+
+				context('if statics.deps is an array', function() {
+					it('should register all dependencies as properties of props.di object', function(done) {
+						this.mixin.set({
+							message: message,
+							alert: alert
+						});
+
+						var specification = {
+							statics: {
+								dependencies: ['message', 'alert']
+							},
+							render: function() {
+								expect(this.props.di.message).to.be(message);
+								expect(this.props.di.alert).to.be(alert);
+
+								return div;
+							}
+						};
+
+						renderSpecification(specification, done);
 					});
 
-					var specification = {
-						render: function() {
-							expect(this.di('message')).to.be(message);
-							expect(this.di('alert')).to.be(alert);
+					it('should warn user about unmet dependency', function(done) {
+						var warn = this.warn;
+						var specification = {
+							displayName: 'test',
+							statics: {
+								dependencies: ['message', 'alert']
+							},
+							render: function() {
+								expect(warn).to.be.calledOnce();
+								expect(warn).to.be.calledWith('ReactDI: Component test requires message, alert but they are not registered');
 
-							return React.DOM.div();
-						}
-					};
+								return div;
+							}
+						};
 
-					renderSpecification(specification, done);
+						renderSpecification(specification, done);
+					});
 				});
+
+				context('if statics.deps is an object', function() {
+					it('should register all dependencies as properties of props.di object under aliased names', function(done) {
+						this.mixin.set({
+							message: message,
+							alert: alert
+						});
+
+						var specification = {
+							statics: {
+								dependencies: {
+									alrt: 'alert',
+									msg: 'message'
+								}
+							},
+							render: function() {
+								expect(this.props.di.msg).to.be(message);
+								expect(this.props.di.alrt).to.be(alert);
+
+								return div;
+							}
+						};
+
+						renderSpecification(specification, done);
+					});
+
+					it('should warn user about unmet dependency', function(done) {
+						var warn = this.warn;
+						var specification = {
+							displayName: 'test',
+							statics: {
+								dependencies: {
+									confrm: 'confirmation'
+								}
+							},
+							render: function() {
+								expect(warn).to.be.calledOnce();
+								expect(warn).to.be.calledWith('ReactDI: Component test requires confirmation but they are not registered');
+
+								return div;
+							}
+						};
+
+						renderSpecification(specification, done);
+					});
+				});
+			});
+		});
+
+		describe('remove()', function() {
+			it('should restore original createElement method', function() {
+				var createElement = function() {},
+					React = { createElement: createElement };
+
+				this.mixin.remove(React);
+				expect(React.createElement).to.be(createElement);
+			});
+
+			it('should cause React.createElement to not inject di into prototypes anymore', function(done) {
+				this.mixin.inject(React);
+				this.mixin.remove(React);
+
+				var specification = {
+					render: function() {
+						expect(this.di).to.not.be.ok();
+
+						return React.DOM.div();
+					}
+				};
+
+				var clazz = React.createClass(specification);
+				React.render(React.createElement(clazz), document.body, done);
 			});
 		});
 	});

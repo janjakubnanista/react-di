@@ -8,7 +8,6 @@ module.exports = function(config) {
 			'lib/*.js',
 			'test/*_test.js'
 		],
-		port: 8080,
 		logLevel: config.LOG_INFO,
 		autoWatch: false,
 		singleRun: true,

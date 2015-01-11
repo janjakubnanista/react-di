@@ -1,4 +1,4 @@
-# ReactDI
+# ReactDI [![Build Status](https://travis-ci.org/janjakubnanista/react-di.svg?branch=master)](https://travis-ci.org/janjakubnanista/react-di)
 
 ReactDI is a simple DI container originaly built for [React.js](https://github.com/facebook/react).
 It is a general solution that allows you to register arbitrary objects to be passed down component hierarchy.

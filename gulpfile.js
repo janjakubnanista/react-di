@@ -17,18 +17,3 @@ gulp.task('build', function() {
 		.pipe(concat('react-di.js'))
 		.pipe(gulp.dest('dist'));
 });
-
-gulp.task('dev', ['test'], function() {
-	gulp.watch(['lib/**', 'test/*_test.js'], ['test']);
-});
-
-gulp.task('test', function(done) {
-	var server = require('karma').server,
-		options = {
-			configFile: __dirname + '/test/karma.conf.js'
-		};
-
-	server.start(options, function() {
-		done();
-	});
-});

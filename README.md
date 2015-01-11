@@ -82,7 +82,7 @@ React.createClass({
 });
 ```
 
-### Dependency validation
+#### Dependency validation
 
 **Only available when using development version of ReactDI**.
 
@@ -106,7 +106,7 @@ React.createClass({
 });
 ```
 
-### Dependency aliasing
+#### Dependency aliasing
 
 If you create your React component class with `statics.dependencies` set to an object hash,
 your dependencies will be available on `di` object under their aliases based on this object:
@@ -129,7 +129,7 @@ React.createClass({
 });
 ```
 
-### Removing ReactDI injection
+#### Removing ReactDI injection
 
 To remove `React.createElement` interception (you should rarely need to do this), just call
 

@@ -1,6 +1,6 @@
 {
   "name": "react-di",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Dependency management for React.js",
   "main": "dist/react-di.js",
   "repository": {

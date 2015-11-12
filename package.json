@@ -1,6 +1,6 @@
 {
   "name": "react-di",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Dependency management for React.js",
   "main": "lib/resolver.js",
   "repository": {

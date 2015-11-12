@@ -3,26 +3,17 @@
 module.exports = function(config) {
 	config.set({
 		basePath: '../',
-		frameworks: ['mocha', 'sinon-expect', 'browserify'],
+		frameworks: ['mocha', 'sinon-expect'],
 		files: [
-			'lib/*.js',
 			'test/*_test.js'
 		],
 		logLevel: config.LOG_INFO,
 		autoWatch: false,
 		singleRun: true,
 		browsers: ['Firefox'],
-		reporters: ['spec', 'coverage'],
+		reporters: ['spec'],
 		preprocessors: {
-			'lib/*.js': ['browserify', 'coverage'],
-			'test/*_test.js': ['browserify']
-		},
-		coverageReporter: {
-			type : 'html',
-			dir : 'coverage/'
-		},
-		browserify: {
-			transform: [['envify', { NODE_ENV: 'development' }]]
+			'test/*_test.js': ['webpack']
 		}
 	});
 };

@@ -168,56 +168,73 @@ React.render(<Application resolver={resolver}/>, document.body);
 
 ## API
 
-#### Constructor
+- [constructor](#resolver.constructor)
+- [set(name, component)](#resolver.set)
+- [has(name)](#resolver.has)
+- [hasAny(names)](#resolver.hasAny)
+- [get(name)](#resolver.get)
+- [getAny(name)](#resolver.getAny)
 
-##### Params
+### constructor<a name="resolver.constructor"></a>
 
-**`map`** *`Object|ReactDI instance`* *[optional]* Existing ReactDI instance or an object hash of dependencies
+	new ReactDI(
+		[object|ReactDI map]
+	)
+
+`map` is an existing ReactDI instance or an object hash of dependencies
 that will be registered on this instance. Any properties registered on this passed instance (or added to this passed object)
 will be automatically available on created instance.
 
 
-#### .set(name, component);
+### .set(name, component)<a name="resolver.set"></a>
 
-Register new component or multiple components. If `component` is `null` then it is unregistered from the resolver.
+	reactDI set(
+		String|Object name,
+		[Object component]
+	)
 
-##### Params
+When passed a `String` and an object, this method registers `component` under the name `name`. If `component` is null, it will be unregistered.
 
-**`name`** *`Object|String`* Name of the component or an object hash of components.
+Wen passed an `Object` as the first parameter its keys will be used as names and corresponding values as components.
 
-**`component`** *`Mixed`* *[optional]* Component to register. Only needed if `name` was a String.
+This method returns the `ReactDI` instancefor easy chaining.
 
 
+### .has(name)<a name="resolver.has"></a>
 
-#### .has(name);
+	Boolean has(
+		String name
+	)
 
 Returns `true` if a component with given name was registered on this resolver, `false` if not.
 
-##### Params
 
-**`name`** *`String|Array<String>`* String name or array of names to check.
+### .hasAny(names)<a name="resolver.hasAny"></a>
 
-
-#### .hasAny(names);
+	String hasAny(
+		String|Array[String] names
+	)
 
 Returns the **name** of first resolved component if at least one of components with given name was registered on this resolver, `false` if not.
 
-##### Params
 
-**`names`** *`String|Array<String>`* String name or array of names to check.
+### .get(names)<a name="resolver.get"></a>
+
+	Object get(
+		String|Array[String] names
+	)
+
+When called with `String` this method returns a component registered under this `name`.
+
+When called with an array of names this method returns an `Object` with its keys corresponding to array elements.
+
+This method throws an error if any of requested components was not registered.
 
 
-#### .get(name);<a name="resolver.get"></a>
+### .getAny(names)<a name="resolver.getAny"></a>
 
-Returns a component registered under given name, or a collection of components. Throws an error if a component was not registered.
-
-##### Params
-
-**`name`** *`String|Array<String>`* String name or array of names to resolve.
-
-
-#### .getAny(names);
+	Object getAny(
+		String|Array[String] names
+	)
 
 Returns first resolved component or throws an error if none of requested components was registered.
-
-**`name`** *`String|Array<String>`* String name or array of names to resolve.
